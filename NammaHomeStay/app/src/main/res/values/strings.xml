@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Namma HomeStay</string>
+    <string name="tagline">Your Home, Their Experience 🌿</string>
+    <string name="tab_profile">My Home</string>
+    <string name="tab_menu">Today\'s Menu</string>
+    <string name="tab_inquiries">Inquiries</string>
+    <string name="tab_guide">Local Guide</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_add_photo">Add Photo</string>
+    <string name="btn_call">📞 Call</string>
+    <string name="menu_empty">No menu added today. Tap + to add!</string>
+    <string name="checklist_title">🏠 Verification Checklist</string>
+</resources>
