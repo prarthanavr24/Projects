@@ -31,7 +31,6 @@ class HomeStayListFragment : Fragment() {
         rvListings.layoutManager = LinearLayoutManager(requireContext())
 
         adapter = ListingAdapter(listings) { homestay ->
-            // Correctly passing data to the Detail Fragment using the updated newInstance
             val detailFragment = HomeStayDetailFragment.newInstance(
                 name = homestay.hostName,
                 location = homestay.location,
@@ -57,25 +56,25 @@ class HomeStayListFragment : Fragment() {
             hostName = "Malnad Heritage Home",
             location = "Sakleshpur",
             dailyRate = 2500.0,
-            description = "Experience authentic Malnad hospitality with home-cooked food. This traditional home offers a unique glimpse into the local culture and architecture.",
+            description = "Experience authentic Malnad hospitality with home-cooked food. This traditional home offers a unique glimpse into the local culture.",
             isAvailable = true,
-            photoUrls = listOf("https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?q=80&w=1000&auto=format&fit=crop")
+            photoUrls = listOf("https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800")
         ))
         listings.add(HomeStay(
             hostName = "Coorg Coffee Estate Stay",
             location = "Madikeri",
             dailyRate = 3200.0,
-            description = "Stay amidst lush coffee plantations with a private waterfall nearby. Wake up to the aroma of fresh coffee and enjoy estate walks.",
+            description = "Stay amidst lush coffee plantations with a private waterfall nearby. Wake up to the aroma of fresh coffee.",
             isAvailable = true,
-            photoUrls = listOf("https://images.unsplash.com/photo-1501333194171-aa639a67a80a?q=80&w=1000&auto=format&fit=crop")
+            photoUrls = listOf("https://images.unsplash.com/photo-1542332213-9b5a5a3fad35?w=800")
         ))
         listings.add(HomeStay(
             hostName = "River Side Retreat",
             location = "Chikmagalur",
             dailyRate = 1800.0,
-            description = "Budget friendly stay right next to the Hemavathi river. Perfect for groups looking for adventure and nature.",
+            description = "Budget friendly stay right next to the Hemavathi river. Perfect for groups looking for adventure.",
             isAvailable = false,
-            photoUrls = listOf("https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=1000&auto=format&fit=crop")
+            photoUrls = listOf("https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800")
         ))
         adapter.notifyDataSetChanged()
     }
