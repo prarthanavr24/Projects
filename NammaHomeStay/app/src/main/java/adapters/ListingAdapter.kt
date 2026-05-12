@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.nammahomestay.R
+import com.google.android.material.button.MaterialButton
 import models.HomeStay
 
 class ListingAdapter(
@@ -22,6 +23,7 @@ class ListingAdapter(
         val tvLocation: TextView    = itemView.findViewById(R.id.tv_location)
         val tvDescription: TextView = itemView.findViewById(R.id.tv_description)
         val tvAvailability: TextView = itemView.findViewById(R.id.tv_availability)
+        val btnBook: MaterialButton = itemView.findViewById(R.id.btn_book)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListingViewHolder {
@@ -55,7 +57,9 @@ class ListingAdapter(
             holder.ivImage.setImageResource(android.R.drawable.ic_menu_gallery)
         }
 
+        // Trigger action when clicking the card OR the button
         holder.itemView.setOnClickListener { onItemClick(homestay) }
+        holder.btnBook.setOnClickListener { onItemClick(homestay) }
     }
 
     override fun getItemCount() = listings.size

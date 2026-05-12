@@ -300,7 +300,7 @@
             android:id="@+id/btn_save_profile"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="80dp"
             android:text="💾 Save My Home Profile"
             android:textSize="16sp"
             app:backgroundTint="@color/primary"

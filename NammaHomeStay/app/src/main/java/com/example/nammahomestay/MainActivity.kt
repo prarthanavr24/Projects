@@ -1,13 +1,9 @@
 package com.example.nammahomestay
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import host.DailyMenuActivity
-import host.HomeProfileActivity
-import host.InquiryBoxActivity
-import host.LocalGuideActivity
+import androidx.fragment.app.Fragment
+import com.example.nammahomestay.fragments.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -18,23 +14,29 @@ class MainActivity : AppCompatActivity() {
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
-        // Open Home Profile by default
-        openActivity(HomeProfileActivity::class.java)
-        bottomNav.selectedItemId = R.id.nav_profile
+        // Set default fragment on first launch
+        if (savedInstanceState == null) {
+            loadFragment(HomeProfileFragment())
+            bottomNav.selectedItemId = R.id.nav_profile
+        }
 
-        bottomNav.setOnItemSelectedListener { item: MenuItem ->
-            when (item.itemId) {
-                R.id.nav_profile   -> openActivity(HomeProfileActivity::class.java)
-                R.id.nav_menu      -> openActivity(DailyMenuActivity::class.java)
-                R.id.nav_inquiries -> openActivity(InquiryBoxActivity::class.java)
-                R.id.nav_guide     -> openActivity(LocalGuideActivity::class.java)
-                R.id.nav_listings  -> openActivity(HomeStayListActivity::class.java)
+        bottomNav.setOnItemSelectedListener { item ->
+            val fragment: Fragment = when (item.itemId) {
+                R.id.nav_profile   -> HomeProfileFragment()
+                R.id.nav_menu      -> DailyMenuFragment()
+                R.id.nav_inquiries -> InquiryBoxFragment()
+                R.id.nav_guide     -> LocalGuideFragment()
+                R.id.nav_listings  -> HomeStayListFragment()
+                else -> HomeProfileFragment()
             }
+            loadFragment(fragment)
             true
         }
     }
 
-    private fun openActivity(cls: Class<*>) {
-        startActivity(Intent(this, cls))
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
     }
 }

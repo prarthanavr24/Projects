@@ -16,7 +16,8 @@ import com.google.android.material.button.MaterialButton
 
 class InquiryAdapter(
     private val inquiries: MutableList<Inquiry>,
-    private val context: Context
+    private val context: Context,
+    private val onInquiryInteracted: (Inquiry) -> Unit
 ) : RecyclerView.Adapter<InquiryAdapter.InquiryViewHolder>() {
 
     class InquiryViewHolder(itemView: View) :
@@ -28,7 +29,6 @@ class InquiryAdapter(
         val tvDates: TextView           = itemView.findViewById(R.id.tv_dates)
         val tvGuests: TextView          = itemView.findViewById(R.id.tv_guests)
         val tvNewBadge: TextView        = itemView.findViewById(R.id.tv_new_badge)
-        val tvSentTime: TextView        = itemView.findViewById(R.id.tv_sent_time)
         val btnCall: MaterialButton     = itemView.findViewById(R.id.btn_call_traveler)
         val btnWhatsApp: MaterialButton = itemView.findViewById(R.id.btn_whatsapp)
     }
@@ -48,45 +48,41 @@ class InquiryAdapter(
         holder.tvDates.text        = "📅 ${inquiry.checkIn} – ${inquiry.checkOut}"
         holder.tvGuests.text       = "👥 ${inquiry.guests} guests"
 
-        // Unread badge + card color
+        // Mark as read when clicking the card
+        holder.cardView.setOnClickListener {
+            onInquiryInteracted(inquiry)
+        }
+
+        // Appearance based on read status
         if (inquiry.isRead) {
             holder.tvNewBadge.visibility = View.GONE
-            holder.cardView.setCardBackgroundColor(0xFFFFFFFF.toInt())
+            holder.cardView.setCardBackgroundColor(0xFFFFFFFF.toInt()) // White
         } else {
             holder.tvNewBadge.visibility = View.VISIBLE
-            holder.cardView.setCardBackgroundColor(0xFFFFF3E0.toInt())
+            holder.cardView.setCardBackgroundColor(0xFFFFF3E0.toInt()) // Light Orange
         }
 
         // 📞 Call button
         holder.btnCall.setOnClickListener {
+            onInquiryInteracted(inquiry) // Also mark as read
             val phone = inquiry.travelerPhone
             if (phone.isNotEmpty()) {
-                val callIntent = Intent(Intent.ACTION_DIAL,
-                    Uri.parse("tel:$phone"))
+                val callIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
                 context.startActivity(callIntent)
-            } else {
-                Toast.makeText(context,
-                    "No phone number available",
-                    Toast.LENGTH_SHORT).show()
             }
         }
 
         // 💬 WhatsApp button
         holder.btnWhatsApp.setOnClickListener {
+            onInquiryInteracted(inquiry) // Also mark as read
             val phone = inquiry.travelerPhone
-            val message = "Namaste! I received your inquiry " +
-                    "for a stay from ${inquiry.checkIn} " +
-                    "to ${inquiry.checkOut}. " +
-                    "Let me share the details."
+            val msg = "Namaste ${inquiry.travelerName}! Received your inquiry for ${inquiry.checkIn}."
             try {
                 val waIntent = Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://wa.me/91$phone" +
-                            "?text=${Uri.encode(message)}"))
+                    Uri.parse("https://wa.me/91$phone?text=${Uri.encode(msg)}"))
                 context.startActivity(waIntent)
             } catch (e: Exception) {
-                Toast.makeText(context,
-                    "WhatsApp not installed",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
             }
         }
     }

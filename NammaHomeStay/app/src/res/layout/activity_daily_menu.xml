@@ -52,10 +52,7 @@
                 android:id="@+id/rv_menu"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="100dp"
+                android:padding="8dp"
                 android:clipToPadding="false"
                 tools:listitem="@layout/item_menu" />
 

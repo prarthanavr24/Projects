@@ -26,7 +26,11 @@ class InquiryBoxActivity : AppCompatActivity() {
         rvInquiries = findViewById(R.id.rv_inquiries)
 
         rvInquiries.layoutManager = LinearLayoutManager(this)
-        adapter = InquiryAdapter(inquiries, this)
+        
+        // Pass the required click listener to the adapter
+        adapter = InquiryAdapter(inquiries, this) { clickedInquiry ->
+            markAsRead(clickedInquiry.id)
+        }
         rvInquiries.adapter = adapter
 
         loadDummyInquiries()
@@ -34,6 +38,7 @@ class InquiryBoxActivity : AppCompatActivity() {
 
     private fun loadDummyInquiries() {
         inquiries.add(Inquiry().apply {
+            id            = "1"
             travelerName  = "Prarthana"
             travelerPhone = "9008124215"
             message       = "Interested in a 2-night stay with family. Is the room available?"
@@ -44,6 +49,7 @@ class InquiryBoxActivity : AppCompatActivity() {
         })
 
         inquiries.add(Inquiry().apply {
+            id            = "2"
             travelerName  = "Prathiksha"
             travelerPhone = "6363843718"
             message       = "Looking for a peaceful weekend stay. Do you serve home cooked food?"
@@ -54,6 +60,7 @@ class InquiryBoxActivity : AppCompatActivity() {
         })
 
         inquiries.add(Inquiry().apply {
+            id            = "3"
             travelerName  = "Appu"
             travelerPhone = "9632114219"
             message       = "Planning a solo trip. Can I get a single room?"
@@ -63,14 +70,22 @@ class InquiryBoxActivity : AppCompatActivity() {
             isRead        = false
         })
 
-        val unread = inquiries.count { !it.isRead }
-        tvTotal.text  = inquiries.size.toString()
-        tvUnread.text = unread.toString()
+        updateCounts()
         adapter.notifyDataSetChanged()
     }
 
+    private fun updateCounts() {
+        val unread = inquiries.count { !it.isRead }
+        tvTotal.text  = inquiries.size.toString()
+        tvUnread.text = unread.toString()
+    }
+
     fun markAsRead(inquiryId: String) {
-        inquiries.find { it.id == inquiryId }?.isRead = true
-        adapter.notifyDataSetChanged()
+        val inquiry = inquiries.find { it.id == inquiryId }
+        if (inquiry != null && !inquiry.isRead) {
+            inquiry.isRead = true
+            updateCounts()
+            adapter.notifyDataSetChanged()
+        }
     }
 }
