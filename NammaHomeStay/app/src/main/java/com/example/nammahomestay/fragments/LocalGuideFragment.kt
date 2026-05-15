@@ -16,6 +16,7 @@ import com.example.nammahomestay.R
 import adapters.LocalSpotAdapter
 import models.LocalSpot
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import utils.FirebaseDbManager
 
 class LocalGuideFragment : Fragment() {
 
@@ -41,8 +42,17 @@ class LocalGuideFragment : Fragment() {
         view.findViewById<ExtendedFloatingActionButton>(R.id.fab_add_spot)
             .setOnClickListener { showAddSpotDialog() }
 
-        if (spots.isEmpty()) {
-            loadDummySpots()
+        // CONNECT TO REAL FIREBASE DATA
+        FirebaseDbManager.listenToSpots { remoteSpots ->
+            if (isAdded) {
+                spots.clear()
+                if (remoteSpots.isEmpty()) {
+                    loadDummySpots()
+                } else {
+                    spots.addAll(remoteSpots)
+                }
+                adapter.notifyDataSetChanged()
+            }
         }
     }
 
@@ -55,9 +65,13 @@ class LocalGuideFragment : Fragment() {
             description = "Amazing 180° view of the Western Ghats."
             bestTime    = "Evening 5-6 PM"
         })
-        spots.add(LocalSpot("Organic Spice Farm", "Farm", 0.5).apply {
-            description = "Walk through cardamom, pepper and vanilla plants."
-            bestTime    = "Anytime"
+        spots.add(LocalSpot("Ancient Temple Ruins", "Heritage", 5.0).apply {
+            description = "A peaceful 12th-century temple tucked away in the forest."
+            bestTime    = "Early Morning"
+        })
+        spots.add(LocalSpot("Secret River Bank", "Nature", 2.0).apply {
+            description = "A quiet spot perfect for a private picnic by the Hemavathi river."
+            bestTime    = "Afternoon"
         })
         adapter.notifyDataSetChanged()
     }
@@ -98,9 +112,7 @@ class LocalGuideFragment : Fragment() {
                 val distStr = etDistance.text.toString().trim()
 
                 if (name.isEmpty() || type.isEmpty() || distStr.isEmpty()) {
-                    Toast.makeText(requireContext(),
-                        "Please fill required fields",
-                        Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Please fill required fields", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
@@ -108,9 +120,13 @@ class LocalGuideFragment : Fragment() {
                     description = etDescription.text.toString().trim()
                     bestTime    = etBestTime.text.toString().trim()
                 }
-                spots.add(spot)
-                adapter.notifyDataSetChanged()
-                Toast.makeText(requireContext(), "Spot added! 🌟", Toast.LENGTH_SHORT).show()
+
+                // SAVE TO FIREBASE
+                FirebaseDbManager.saveSpot(spot) { success ->
+                    if (isAdded && success) {
+                        Toast.makeText(requireContext(), "Spot saved to Cloud! 🌟", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
             .setNegativeButton("Cancel", null)
             .show()

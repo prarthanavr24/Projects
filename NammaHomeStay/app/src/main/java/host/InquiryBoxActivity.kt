@@ -51,7 +51,7 @@ class InquiryBoxActivity : AppCompatActivity() {
         inquiries.add(Inquiry().apply {
             id            = "2"
             travelerName  = "Prathiksha"
-            travelerPhone = "6363843718"
+            travelerPhone = "9632114219"
             message       = "Looking for a peaceful weekend stay. Do you serve home cooked food?"
             checkIn       = "Jun 20"
             checkOut      = "Jun 21"
@@ -62,7 +62,7 @@ class InquiryBoxActivity : AppCompatActivity() {
         inquiries.add(Inquiry().apply {
             id            = "3"
             travelerName  = "Appu"
-            travelerPhone = "9632114219"
+            travelerPhone = "6361563631"
             message       = "Planning a solo trip. Can I get a single room?"
             checkIn       = "Jul 01"
             checkOut      = "Jul 03"

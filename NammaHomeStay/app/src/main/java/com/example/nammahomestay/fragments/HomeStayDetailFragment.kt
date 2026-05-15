@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.nammahomestay.R
 import com.google.android.material.button.MaterialButton
+import models.Inquiry
+import utils.FirebaseDbManager
 
 class HomeStayDetailFragment : Fragment() {
 
@@ -24,7 +26,6 @@ class HomeStayDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Get data from arguments
         val name = arguments?.getString("name") ?: "HomeStay"
         val location = arguments?.getString("location") ?: "Unknown"
         val price = arguments?.getDouble("price", 0.0) ?: 0.0
@@ -49,16 +50,35 @@ class HomeStayDetailFragment : Fragment() {
         tvDescription.text = description
 
         if (imageUrl.isNotEmpty()) {
-            Glide.with(this)
-                .load(imageUrl)
-                .placeholder(R.color.primary_light)
-                .into(ivImage)
-        } else {
-            ivImage.setImageResource(android.R.drawable.ic_menu_gallery)
+            Glide.with(this).load(imageUrl).placeholder(R.color.primary_light).into(ivImage)
         }
 
         btnInquire.setOnClickListener {
-            Toast.makeText(requireContext(), "Inquiry sent to $name! 🙏", Toast.LENGTH_LONG).show()
+            // SEND REAL INQUIRY TO FIREBASE
+            val newInquiry = Inquiry().apply {
+                travelerName = "Guest User"
+                message = "I am interested in booking $name. Please contact me."
+                checkIn = "Jul 01"
+                checkOut = "Jul 05"
+                guests = 2
+                isRead = false
+            }
+
+            btnInquire.isEnabled = false
+            btnInquire.text = "Sending..."
+
+            FirebaseDbManager.sendInquiry(newInquiry) { success ->
+                if (isAdded) {
+                    btnInquire.isEnabled = true
+                    btnInquire.text = "Inquire Now"
+                    if (success) {
+                        Toast.makeText(requireContext(), "Inquiry sent to $name! 🙏", Toast.LENGTH_LONG).show()
+                        parentFragmentManager.popBackStack() // Go back to list
+                    } else {
+                        Toast.makeText(requireContext(), "Failed to send inquiry", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 
