@@ -5,22 +5,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.nammahomestay.R
 import adapters.InquiryAdapter
 import models.Inquiry
+import utils.FirebaseDbManager
 
-// Temporary global storage so data doesn't reset when switching tabs
-object InquiryDataRepo {
+// Singleton to keep data alive during the app session
+object InquiryRepo {
     val inquiries = mutableListOf<Inquiry>()
 
     init {
-        inquiries.add(Inquiry("1", "Prarthana", "9008124215", "Interested in a 2-night stay. Is it available?", "Jun 15", "Jun 17", 3, false))
-        inquiries.add(Inquiry("2", "Prathiksha", "6363843718", "Do you serve home cooked food?", "Jun 20", "Jun 21", 2, true))
-        inquiries.add(Inquiry("3", "Appu", "9632114219", "Planning a solo trip. Single room?", "Jul 01", "Jul 03", 1, false))
+        inquiries.add(Inquiry("d1", "Prarthana", "9008124215", "Interested in a 2-night stay with family.", "Jun 15", "Jun 17", 3, false))
+        inquiries.add(Inquiry("d2", "Prathiksha", "6363843718", "Looking for a peaceful weekend stay.", "Jun 20", "Jun 21", 2, true))
+        inquiries.add(Inquiry("d3", "Ravi Kumar", "9876543210", "Planning a trip next month. Any discount?", "Jul 10", "Jul 17", 1, false))
+        inquiries.add(Inquiry("d4", "Ananya", "8884445555", "Is there WiFi available for remote work?", "Aug 05", "Aug 08", 2, false))
+        inquiries.add(Inquiry("d5", "Sandeep", "9900112233", "Do you have space for 5 people this weekend?", "Jun 25", "Jun 27", 5, false))
+        inquiries.add(Inquiry("d6", "Meghana", "7766554433", "Is breakfast included in the daily rate?", "Jul 02", "Jul 04", 2, false))
     }
 }
 
@@ -47,28 +50,42 @@ class InquiryBoxFragment : Fragment() {
 
         rvInquiries.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = InquiryAdapter(InquiryDataRepo.inquiries, requireContext()) { clickedInquiry ->
-            markAsRead(clickedInquiry.id)
+        adapter = InquiryAdapter(InquiryRepo.inquiries, requireContext()) { clickedInquiry ->
+            // Update locally for instant count change
+            if (!clickedInquiry.isRead) {
+                clickedInquiry.isRead = true
+                updateCounts()
+                adapter.notifyDataSetChanged()
+
+                // If it's a real Firebase inquiry, update cloud
+                if (!clickedInquiry.id.startsWith("d")) {
+                    FirebaseDbManager.markInquiryAsRead(clickedInquiry.id)
+                }
+            }
         }
         rvInquiries.adapter = adapter
+
+        // Sync with real Firebase inquiries
+        FirebaseDbManager.listenToInquiries { remoteInquiries ->
+            if (isAdded) {
+                remoteInquiries.forEach { remote ->
+                    val existing = InquiryRepo.inquiries.find { it.id == remote.id }
+                    if (existing != null) {
+                        existing.isRead = remote.isRead
+                    } else {
+                        InquiryRepo.inquiries.add(remote)
+                    }
+                }
+                updateCounts()
+                adapter.notifyDataSetChanged()
+            }
+        }
 
         updateCounts()
     }
 
     private fun updateCounts() {
-        val total = InquiryDataRepo.inquiries.size
-        val unread = InquiryDataRepo.inquiries.count { !it.isRead }
-        tvTotal.text = total.toString()
-        tvUnread.text = unread.toString()
-    }
-
-    private fun markAsRead(inquiryId: String) {
-        val inquiry = InquiryDataRepo.inquiries.find { it.id == inquiryId }
-        if (inquiry != null && !inquiry.isRead) {
-            inquiry.isRead = true
-            updateCounts()
-            adapter.notifyDataSetChanged()
-            Toast.makeText(requireContext(), "Marked as read", Toast.LENGTH_SHORT).show()
-        }
+        tvTotal.text = InquiryRepo.inquiries.size.toString()
+        tvUnread.text = InquiryRepo.inquiries.count { !it.isRead }.toString()
     }
 }
